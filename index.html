@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rezepte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Rezepte</h1>
+    <input type="text" id="search" placeholder="Suchen…" autocomplete="off" />
+    <div class="view-toggle">
+      <button id="btn-grid" class="active" title="Kacheln">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
+      </button>
+      <button id="btn-table" title="Tabelle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h18v2H3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <button class="chip active" data-filter="alle">Alle</button>
+    <button class="chip" id="btn-tags">Tags</button>
+    <div class="filter-divider"></div>
+    <button class="chip" data-rating="3">★ 3+</button>
+    <button class="chip" data-rating="4">★ 4+</button>
+    <button class="chip" data-rating="5">★ 5</button>
+  </div>
+  <div class="tag-filter-bar hidden" id="tag-filter-bar"></div>
+
+  <main id="content">
+    <div id="loading">Lade Rezepte…</div>
+
+    <div id="grid-view" class="grid hidden"></div>
+
+    <div id="table-view" class="hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Titel</th>
+            <th>Plattform</th>
+            <th>Kcal</th>
+            <th>Bewertung</th>
+            <th>Tags</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Detail Modal -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal">
+      <button id="modal-close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
