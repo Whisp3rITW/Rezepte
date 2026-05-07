@@ -89,16 +89,19 @@ function renderGrid(list) {
   if (!list.length) { el.innerHTML = '<p style="color:var(--text-muted)">Keine Rezepte gefunden.</p>'; return; }
   el.innerHTML = list.map(r => `
     <div class="card" data-id="${+r.id}">
-      <div class="card-header">
-        <div class="card-title">${esc(r.titel)}</div>
-        <span class="badge badge-${esc(r.plattform)}">${esc(r.plattform)}</span>
+      ${r.bild_url ? `<img class="card-image" src="${esc(r.bild_url)}" alt="${esc(r.titel)}" loading="lazy" />` : '<div class="card-image-placeholder"></div>'}
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">${esc(r.titel)}</div>
+          <span class="badge badge-${esc(r.plattform)}">${esc(r.plattform)}</span>
+        </div>
+        <div class="card-meta">
+          ${r.portionen ? `<span>${+r.portionen} Portionen</span>` : ''}
+          ${r.kalorien_pro_portion ? `<span>${+r.kalorien_pro_portion} kcal</span>` : ''}
+        </div>
+        <div class="card-stars">${renderStars(r.bewertung)}</div>
+        ${(r.tags || []).length ? `<div class="tags">${r.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
       </div>
-      <div class="card-meta">
-        ${r.portionen ? `<span>${+r.portionen} Portionen</span>` : ''}
-        ${r.kalorien_pro_portion ? `<span>${+r.kalorien_pro_portion} kcal</span>` : ''}
-      </div>
-      <div class="card-stars">${renderStars(r.bewertung)}</div>
-      ${(r.tags || []).length ? `<div class="tags">${r.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
     </div>
   `).join('');
   el.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => openModal(+c.dataset.id)));
@@ -150,6 +153,7 @@ function buildModal(r) {
   const url = safeUrl(r.quelle_url);
 
   return `
+    ${r.bild_url ? `<img class="modal-image" src="${esc(r.bild_url)}" alt="${esc(r.titel)}" />` : ''}
     <div class="modal-title">${esc(r.titel)}</div>
     <div class="modal-meta">
       <span class="badge badge-${esc(r.plattform)}">${esc(r.plattform)}</span>
