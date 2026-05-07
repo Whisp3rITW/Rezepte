@@ -99,6 +99,32 @@ header h1 {
   border-bottom: 1px solid var(--border);
 }
 
+.zutaten-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 24px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.zutaten-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.zutaten-search {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  max-width: 320px;
+  transition: border-color 0.2s;
+}
+.zutaten-search:focus { border-color: var(--accent); }
+.zutaten-search::placeholder { color: var(--text-muted); }
+
 /* ── Main ── */
 main { padding: 24px; }
 

@@ -26,12 +26,17 @@
   <div class="filter-bar">
     <button class="chip active" data-filter="alle">Alle</button>
     <button class="chip" id="btn-tags">Tags</button>
+    <button class="chip" id="btn-zutaten">Zutaten</button>
     <div class="filter-divider"></div>
     <button class="chip" data-rating="3">★ 3+</button>
     <button class="chip" data-rating="4">★ 4+</button>
     <button class="chip" data-rating="5">★ 5</button>
   </div>
   <div class="tag-filter-bar hidden" id="tag-filter-bar"></div>
+  <div class="zutaten-filter-bar hidden" id="zutaten-filter-bar">
+    <input type="text" id="zutaten-search" class="zutaten-search hidden" placeholder="Zutaten filtern…" autocomplete="off" />
+    <div class="zutaten-chips" id="zutaten-chips"></div>
+  </div>
 
   <main id="content">
     <div id="loading">Lade Rezepte…</div>

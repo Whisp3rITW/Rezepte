@@ -9,6 +9,8 @@ let currentView = 'grid';
 let currentFilter = 'alle';
 let currentSearch = '';
 let activeTags = new Set();
+let activeZutaten = new Set();
+let zutatenChipFilter = '';
 let currentRatingFilter = 0;
 let ratingPending = false;
 
@@ -38,6 +40,7 @@ async function init() {
   if (error) { document.getElementById('loading').textContent = 'Fehler beim Laden.'; return; }
   allRezepte = data || [];
   renderTagFilter();
+  renderZutatenFilter();
   render();
 }
 
@@ -59,6 +62,53 @@ function renderTagFilter() {
   });
 }
 
+// ── Zutaten-Filter rendern ────────────────────────────────────
+function renderZutatenFilter() {
+  const wrap = document.getElementById('zutaten-filter-bar');
+  const chipsEl = document.getElementById('zutaten-chips');
+  const searchEl = document.getElementById('zutaten-search');
+
+  // Map: lowercase+trim -> erste gefundene Original-Schreibweise
+  const zutatenMap = new Map();
+  for (const r of allRezepte) {
+    for (const z of (r.zutaten || [])) {
+      if (!z || !z.name) continue;
+      const key = z.name.toLowerCase().trim();
+      if (!key) continue;
+      if (!zutatenMap.has(key)) zutatenMap.set(key, z.name.trim());
+    }
+  }
+  const entries = [...zutatenMap.entries()].sort((a, b) => a[0].localeCompare(b[0], 'de'));
+  if (!entries.length) { wrap.classList.add('hidden'); return; }
+
+  // Suchfeld nur ab > 30 Chips zeigen
+  if (entries.length > 30) searchEl.classList.remove('hidden');
+  else searchEl.classList.add('hidden');
+
+  const q = zutatenChipFilter.toLowerCase().trim();
+  const visible = q ? entries.filter(([k]) => k.includes(q)) : entries;
+
+  chipsEl.innerHTML = visible.map(([key, label]) => `
+    <button class="chip zutat-chip${activeZutaten.has(key) ? ' active' : ''}" data-zutat="${esc(key)}">${esc(label)}</button>
+  `).join('');
+  chipsEl.querySelectorAll('.zutat-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const z = btn.dataset.zutat;
+      activeZutaten.has(z) ? activeZutaten.delete(z) : activeZutaten.add(z);
+      btn.classList.toggle('active');
+      updateZutatenButtonLabel();
+      render();
+    });
+  });
+  updateZutatenButtonLabel();
+}
+
+function updateZutatenButtonLabel() {
+  const btn = document.getElementById('btn-zutaten');
+  if (!btn) return;
+  btn.textContent = activeZutaten.size > 0 ? `Zutaten (${activeZutaten.size})` : 'Zutaten';
+}
+
 // ── Render ────────────────────────────────────────────────────
 function filtered() {
   return allRezepte.filter(r => {
@@ -70,9 +120,13 @@ function filtered() {
       (r.zutaten || []).some(z => z.name && z.name.toLowerCase().includes(q));
     const matchTags = activeTags.size === 0 ||
       [...activeTags].every(t => (r.tags || []).includes(t));
+    const matchZutaten = activeZutaten.size === 0 ||
+      [...activeZutaten].every(z =>
+        (r.zutaten || []).some(zr => zr.name && zr.name.toLowerCase().trim() === z)
+      );
     const matchRating = currentRatingFilter === 0 ||
       (r.bewertung != null && r.bewertung >= currentRatingFilter);
-    return matchFilter && matchSearch && matchTags && matchRating;
+    return matchFilter && matchSearch && matchTags && matchZutaten && matchRating;
   });
 }
 
@@ -315,6 +369,28 @@ document.getElementById('btn-tags').addEventListener('click', () => {
   }
   bar.classList.toggle('hidden');
   btn.classList.toggle('active');
+});
+
+document.getElementById('btn-zutaten').addEventListener('click', () => {
+  const bar = document.getElementById('zutaten-filter-bar');
+  const btn = document.getElementById('btn-zutaten');
+  const searchEl = document.getElementById('zutaten-search');
+  const isOpen = !bar.classList.contains('hidden');
+  if (isOpen) {
+    activeZutaten.clear();
+    zutatenChipFilter = '';
+    if (searchEl) searchEl.value = '';
+    renderZutatenFilter();
+    render();
+  }
+  bar.classList.toggle('hidden');
+  btn.classList.toggle('active');
+  updateZutatenButtonLabel();
+});
+
+document.getElementById('zutaten-search').addEventListener('input', e => {
+  zutatenChipFilter = e.target.value;
+  renderZutatenFilter();
 });
 
 document.querySelectorAll('.chip[data-rating]').forEach(chip => {
