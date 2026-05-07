@@ -35,7 +35,10 @@ function safeUrl(url) {
 
 // ── Init ──────────────────────────────────────────────────────
 async function init() {
-  const { data, error } = await db.from('rezepte').select('*').order('erstellt', { ascending: false });
+  // Whitelist: explizit nur die Spalten ziehen, die das Frontend nutzt.
+  // Insbesondere KEIN caption_roh (Original-Insta/TikTok-Captions, § 19a UrhG).
+  const COLS = 'id,titel,plattform,portionen,kalorien_pro_portion,bewertung,tags,zutaten,zubereitung,makros,bild_url,quelle_url,erstellt';
+  const { data, error } = await db.from('rezepte').select(COLS).order('erstellt', { ascending: false });
   document.getElementById('loading').classList.add('hidden');
   if (error) { document.getElementById('loading').textContent = 'Fehler beim Laden.'; return; }
   allRezepte = data || [];
